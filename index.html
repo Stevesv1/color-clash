@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Clash Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #ff870f;
+      position: relative;
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    #opening-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ff870f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      text-align: center;
+    }
+
+    #opening-animation .logo {
+      font-size: 40px;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #opening-animation p {
+      font-size: 22px;
+      color: #F5F5F5;
+      margin-bottom: 30px;
+    }
+
+    #lets-go-btn {
+      background-color: #faad06;
+      color: rgb(0, 0, 0);
+      border: none;
+      padding: 12px 24px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #lets-go-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    #rules-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      text-align: center;
+      width: 400px;
+      max-width: 90%;
+    }
+
+    #rules-popup h2 {
+      margin-top: 0;
+      color: #6f00fc;
+      font-size: 28px;
+    }
+
+    #rule-text {
+      font-size: 18px;
+      margin: 20px 0;
+      color: #333;
+      word-wrap: break-word;
+      height: 100px;
+      overflow: auto;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+    }
+
+    #rules-navigation {
+      display: flex;
+      align-items: center;
+    }
+
+    #right-buttons {
+      margin-left: auto;
+      display: flex;
+    }
+
+    #rules-navigation button, #start-game-btn {
+      background-color: black;
+      color: white;
+      border: 2px solid white;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5);
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #rules-navigation button:hover, #start-game-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 255, 255, 0.7);
+    }
+
+    #game-container {
+      display: none;
+      text-align: center;
+    }
+
+    #text-container {
+      padding: 15px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 25px;
+    }
+
+    #color-text {
+      font-size: 48px;
+      font-weight: 700;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+      transform: perspective(500px) rotateX(10deg);
+    }
+
+    .option {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .option:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    #score, #timer {
+      font-size: 24px;
+      margin-top: 15px;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    #game-over {
+      display: none;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+
+    #game-over h2 {
+      font-size: 32px;
+      color: #db2929;
+      margin: 0;
+      animation: gameOverAnim 0.5s ease-out;
+    }
+
+    @keyframes gameOverAnim {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    #scorecard {
+      font-size: 24px;
+      margin-top: 15px;
+      color: #333;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .button-container button {
+      margin: 0 15px;
+      padding: 12px 24px;
+      font-size: 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .button-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    #share-btn {
+      background: linear-gradient(to right, #1DA1F2, #0d95e8);
+      color: white;
+    }
+
+    #play-again-btn {
+      background: linear-gradient(to right, #4CAF50, #45a049);
+      color: white;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 14px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div id="opening-animation">
+    <canvas id="confetti-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+    <div class="logo">Seeing Signs</div>
+    <p>You are entering the world of Orange Dynasty</p>
+    <button id="lets-go-btn">Let's Go</button>
+  </div>
+  <div id="rules-popup">
+    <h2>Game Rules</h2>
+    <div id="rule-text"></div>
+    <div id="rules-navigation">
+      <div id="prev-container">
+        <button id="prev-rule-btn">Previous</button>
+      </div>
+      <div id="right-buttons">
+        <button id="next-rule-btn">Next</button>
+        <button id="start-game-btn" style="display: none;">Start Game</button>
+      </div>
+    </div>
+  </div>
+  <div id="game-container">
+    <div id="text-container">
+      <div id="color-text"></div>
+    </div>
+    <div id="options"></div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time Left: 30s</div>
+  </div>
+  <div id="game-over">
+    <h2>Game Over!</h2>
+    <div id="scorecard">Your Score: <span id="final-score"></span></div>
+    <div class="button-container">
+      <button id="share-btn">Share on X</button>
+      <button id="play-again-btn">Play Again</button>
+    </div>
+  </div>
+  <footer>
+    <p>Made with 🧡 by <a href="https://x.com/Stevesv12" target="_blank">Steves</a> for <a href="https://x.com/sign" target="_blank">Sign</a></p>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const openingAnimation = document.getElementById('opening-animation');
+      const rulesPopup = document.getElementById('rules-popup');
+      const letsGoBtn = document.getElementById('lets-go-btn');
+      const confettiCanvas = document.getElementById('confetti-canvas');
+      const myConfetti = confetti.create(confettiCanvas, { resize: true });
+      openingAnimation.style.display = 'flex';
+      rulesPopup.style.display = 'none';
+      const duration = 5 * 1000;
+      let end = Date.now() + duration;
+      (function frame() {
+        myConfetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
+        });
+        myConfetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+      letsGoBtn.addEventListener('click', () => {
+        openingAnimation.style.display = 'none';
+        rulesPopup.style.display = 'block';
+        myConfetti.reset();
+      });
+      particlesJS("particles-js", {
+        "particles": {
+          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "color": { "value": "#ffffff" },
+          "shape": { "type": "circle" },
+          "opacity": { "value": 0.5, "random": true },
+          "size": { "value": 3, "random": true },
+          "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 },
+          "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": { "enable": true, "mode": "repulse" },
+            "onclick": { "enable": true, "mode": "push" },
+            "resize": true
+          },
+          "modes": {
+            "repulse": { "distance": 200, "duration": 0.4 },
+            "push": { "particles_nb": 4 }
+          }
+        },
+        "retina_detect": true
+      });
+      const colors = ['White', 'Black', 'Red', 'Pink', 'Brown', 'Violet', 'Yellow', 'Orange'];
+      const colorStyles = ['white', 'black', 'red', 'pink', 'brown', 'violet', 'yellow', 'orange'];
+      let score = 0;
+      let correctAnswer = '';
+      let timeLeft = 30;
+      let timer;
+      const rules = [
+        "You have 30 seconds to play.",
+        "A word will be displayed in a random color different from what the word says.",
+        "Choose the button that matches the color of the text, not the word itself.",
+        "Each correct answer gives you a point and presents a new word.",
+        "If you choose incorrectly, the game ends immediately.",
+        "The game also ends when the time runs out.",
+        "Try to score as many points as possible within the time limit without making a mistake."
+      ];
+      let currentRuleIndex = 0;
+      const ruleText = document.getElementById('rule-text');
+      const prevBtn = document.getElementById('prev-rule-btn');
+      const nextBtn = document.getElementById('next-rule-btn');
+      const startBtn = document.getElementById('start-game-btn');
+      function updateRuleDisplay() {
+        ruleText.textContent = rules[currentRuleIndex];
+        document.getElementById('prev-container').style.display = currentRuleIndex === 0 ? 'none' : 'block';
+        nextBtn.style.display = currentRuleIndex === rules.length - 1 ? 'none' : 'inline-block';
+        startBtn.style.display = currentRuleIndex === rules.length - 1 ? 'inline-block' : 'none';
+      }
+      updateRuleDisplay();
+      prevBtn.addEventListener('click', () => {
+        if (currentRuleIndex > 0) {
+          currentRuleIndex--;
+          updateRuleDisplay();
+        }
+      });
+      nextBtn.addEventListener('click', () => {
+        if (currentRuleIndex < rules.length - 1) {
+          currentRuleIndex++;
+          updateRuleDisplay();
+        }
+      });
+      startBtn.addEventListener('click', startGame);
+      function startGame() {
+        rulesPopup.style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        startRound();
+        startTimer();
+      }
+      function getRandomColorName() {
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+      function getRandomColorStyle(excludeColor) {
+        let randomColor = colorStyles[Math.floor(Math.random() * colorStyles.length)];
+        while (randomColor.toLowerCase() === excludeColor.toLowerCase()) {
+          randomColor = colorStyles[Math.floor(Math.random() * colorStyles.length)];
+        }
+        return randomColor;
+      }
+      function startRound() {
+        const displayText = getRandomColorName();
+        correctAnswer = getRandomColorStyle(displayText);
+        const colorText = document.getElementById('color-text');
+        colorText.textContent = displayText;
+        colorText.style.color = correctAnswer;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        let options = [correctAnswer.charAt(0).toUpperCase() + correctAnswer.slice(1)];
+        while (options.length < 3) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          if (!options.includes(randomColor)) options.push(randomColor);
+        }
+        options.sort(() => Math.random() - 0.5);
+        options.forEach(option => {
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.className = 'option';
+          button.onclick = () => checkAnswer(option);
+          optionsDiv.appendChild(button);
+        });
+      }
+      function checkAnswer(selected) {
+        if (selected.toLowerCase() === correctAnswer.toLowerCase()) {
+          score++;
+          document.getElementById('score').textContent = `Score: ${score}`;
+          if (timeLeft > 0) startRound();
+        } else {
+          endGame();
+        }
+      }
+      function startTimer() {
+        timer = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            endGame();
+          }
+        }, 1000);
+      }
+      function endGame() {
+        clearInterval(timer);
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('game-over').style.display = 'block';
+        document.getElementById('final-score').textContent = score;
+      }
+      document.getElementById('share-btn').addEventListener('click', () => {
+        const gameUrl = 'https://example.com/guess-the-color-game';
+        const tweetText = `I scored ${score} points in the Color Clash Game made by @Stevesv12!\n\n@sign warriors, Can you beat me?\n\n${gameUrl}`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
+      });
+      document.getElementById('play-again-btn').addEventListener('click', () => {
+        score = 0;
+        timeLeft = 30;
+        document.getElementById('score').textContent = 'Score: 0';
+        document.getElementById('timer').textContent = 'Time Left: 30s';
+        document.getElementById('game-container').style.display = 'block';
+        document.getElementById('game-over').style.display = 'none';
+        startRound();
+        startTimer();
+      });
+    });
+  </script>
+</body>
+</html>
