@@ -84,8 +84,8 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
       z-index: 1000;
       text-align: center;
-      width: 400px;
-      max-width: 90%;
+      width: 90%;
+      max-width: 400px;
     }
 
     #rules-popup h2 {
@@ -152,6 +152,12 @@
       transform: perspective(500px) rotateX(10deg);
     }
 
+    #options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
     .option {
       background: linear-gradient(to right, #6a11cb, #2575fc);
       color: white;
@@ -179,11 +185,18 @@
 
     #game-over {
       display: none;
-      text-align: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background-color: rgba(255, 255, 255, 0.95);
       padding: 25px;
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
     }
 
     #game-over h2 {
@@ -255,6 +268,31 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 600px) {
+      #color-text {
+        font-size: 36px;
+      }
+      .option {
+        font-size: 18px;
+        padding: 10px 20px;
+      }
+      #score, #timer {
+        font-size: 20px;
+      }
+      #rules-popup h2 {
+        font-size: 24px;
+      }
+      #rule-text {
+        font-size: 16px;
+      }
+      #game-over h2 {
+        font-size: 28px;
+      }
+      #scorecard {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -304,19 +342,21 @@
       const letsGoBtn = document.getElementById('lets-go-btn');
       const confettiCanvas = document.getElementById('confetti-canvas');
       const myConfetti = confetti.create(confettiCanvas, { resize: true });
+      const isMobile = window.innerWidth < 600;
+      const particleCount = isMobile ? 40 : 80;
       openingAnimation.style.display = 'flex';
       rulesPopup.style.display = 'none';
       const duration = 5 * 1000;
       let end = Date.now() + duration;
       (function frame() {
         myConfetti({
-          particleCount: 5,
+          particleCount: isMobile ? 2 : 5,
           angle: 60,
           spread: 55,
           origin: { x: 0 }
         });
         myConfetti({
-          particleCount: 5,
+          particleCount: isMobile ? 2 : 5,
           angle: 120,
           spread: 55,
           origin: { x: 1 }
@@ -332,7 +372,7 @@
       });
       particlesJS("particles-js", {
         "particles": {
-          "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+          "number": { "value": particleCount, "density": { "enable": true, "value_area": 800 } },
           "color": { "value": "#ffffff" },
           "shape": { "type": "circle" },
           "opacity": { "value": 0.5, "random": true },
@@ -458,7 +498,7 @@
         document.getElementById('final-score').textContent = score;
       }
       document.getElementById('share-btn').addEventListener('click', () => {
-        const gameUrl = 'https://color-clash-v2.vercel.app';
+        const gameUrl = 'https://example.com/guess-the-color-game';
         const tweetText = `I scored ${score} points in the Color Clash Game made by @Stevesv12!\n\n@sign warriors, Can you beat me?\n\n${gameUrl}`;
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
       });
