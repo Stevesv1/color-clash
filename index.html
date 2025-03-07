@@ -498,7 +498,7 @@
         document.getElementById('final-score').textContent = score;
       }
       document.getElementById('share-btn').addEventListener('click', () => {
-        const gameUrl = 'https://example.com/guess-the-color-game';
+        const gameUrl = 'https://color-clash-v2.vercel.app';
         const tweetText = `I scored ${score} points in the Color Clash Game made by @Stevesv12!\n\n@sign warriors, Can you beat me?\n\n${gameUrl}`;
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`, '_blank');
       });
